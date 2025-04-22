@@ -9,15 +9,52 @@ def new_map():
 
 def insert_node (root, key,value):
     
+   def insert_node(root, key, value):
+    """
+    Inserta (key, value) en el RBT con raíz `root`. 
+    Si ya existe la clave, sólo actualiza el valor.
+    Devuelve la nueva raíz del subárbol.
+    """
+    # 1) Inserción BST básica
     if root is None:
-        return 
+        return {
+            "key": key,
+            "value": value,
+            "left": None,
+            "right": None,
+            "color": "RED",    # nuevo nodo siempre rojo
+            "size": 1          # tamaño inicial
+        }
+    if key < root["key"]:
+        root["left"] = insert_node(root["left"], key, value)
+    elif key > root["key"]:
+        root["right"] = insert_node(root["right"], key, value)
+    else:
+        # reemplazo de valor en caso de clave duplicada
+        root["value"] = value
+
+    # 2) Reparaciones LLRB (reglas 2.1, 2.2, 2.3)
+    # 2.1 Si hay enlace rojo a la derecha: rotar izquierda
+    if is_red(root["right"]) and not is_red(root["left"]):
+        root = rotate_left(root)
+    # 2.2 Si hay doble enlace rojo por la izquierda: rotar derecha
+    if is_red(root["left"]) and is_red(root["left"]["left"]):
+        root = rotate_right(root)
+    # 2.3 Si ambos hijos son rojos: flip de colores
+    if is_red(root["left"]) and is_red(root["right"]):
+        flip_colors(root)
+
+    # 3) Actualizar tamaño del subárbol
+    root["size"] = 1 + size_tree(root["left"]) + size_tree(root["right"])
+    return root
+
     
     
-def put (my_bst, key, value):
-    my_bst["root"] = insert_node(my_bst["root"], key, value)
-    my_bst["root"]["color"] = "BLACK"
+def put (my_rbt, key, value):
+    my_rbt["root"] = insert_node(my_rbt["root"], key, value)
+    my_rbt["root"]["color"] = "BLACK"
      
-    return my_bst
+    return my_rbt
 
 
 def get_node (root, key):
@@ -33,9 +70,9 @@ def get_node (root, key):
         
      
     
-def get (my_bst, key):
+def get (my_rbt, key):
     
-    return get_node(my_bst["root"], key)
+    return get_node(my_rbt["root"], key)
 
 
 def remove_node(root, key):
@@ -65,17 +102,17 @@ def remove_node(root, key):
     return root
 
 
-def remove (my_bst, key):
+def remove (my_rbt, key):
     
-    my_bst["root"] = remove_node(my_bst["root"], key)
-    if my_bst["root"] is not None:
-        my_bst["root"]["color"] = "BLACK" # le cambia el color al root a negro que siempre debe ser negro
-    return my_bst
+    my_rbt["root"] = remove_node(my_rbt["root"], key)
+    if my_rbt["root"] is not None:
+        my_rbt["root"]["color"] = "BLACK" # le cambia el color al root a negro que siempre debe ser negro
+    return my_rbt
 
 
-def contains (my_bst,key):
+def contains (my_rbt,key):
     
-    if get(my_bst,key) is not None:
+    if get(my_rbt,key) is not None:
         return True
     else:
         return False
@@ -241,10 +278,28 @@ def ceiling (my_rbt, key):
     x = ceiling_key(my_rbt["root"], key) 
     return x
     
-"""def select_key (root, key):
+
+def select_key (root, key):
     
-def select (my_rbt, key):"""
+    if root is None:
+        return None
+
+    left_count = size_tree(root["left"])
+
+    if key < left_count:
+     
+        return select_key(root["left"], key)
+    elif key == left_count:
+        # es la clave de la raíz
+        return root["key"]
+    else:
+        # está en la derecha, ajustamos pos
+        return select_key(root["right"], key - left_count - 1)
+
     
+def select (my_rbt, pos):
+    
+    return select_key(my_rbt, pos)
     
 def rank_keys (root, key):
     
@@ -335,7 +390,7 @@ def rotate_left (node_rbt):
     node_rbt["right"] = x["left"]   # se cambia el hijo derecho por el hijo izquierdo del hijo derecho
     x["left"] = node_rbt            # se cambia el hijo izquierdo del hijo derecho por el nodo padre
     x["color"] = x["left"]["color"] # se cambia el color del nodo hijo por el del padre
-    x["left"]["color"] = "RED"   # se cambia el color del padre por rojo
+    x["left"]["color"] = "RED"      # se cambia el color del padre por rojo
     x["size"] = node_rbt["size"]
     node_rbt ["size"] = 1 + size_tree(node_rbt["left"]) + size_tree(node_rbt["right"]) # se cambia el tamaño del padre
     

@@ -28,10 +28,15 @@ import os
 import csv
 import datetime
 
-# TODO Realice la importación del Árbol Rojo Negro
-# TODO Realice la importación de ArrayList (al) o SingleLinked (sl) como estructura de datos auxiliar para sus requerimientos
-# TODO Realice la importación de LinearProbing (lp) o Separate Chaining (sp) como estructura de datos auxiliar para sus requerimientos
 
+
+# TODO Realice la importación del Árbol Rojo Negro
+from DataStructures.Tree import red_black_tree as rbt
+# TODO Realice la importación de ArrayList (al) o SingleLinked (sl) como estructura de datos auxiliar para sus requerimientos
+from DataStructures.List import array_list as al
+from DataStructures.List import single_linked_list as sll
+# TODO Realice la importación de LinearProbing (lp) o Separate Chaining (sp) como estructura de datos auxiliar para sus requerimientos
+from DataStructures.Map import map_linear_probing as lp
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 
 
@@ -218,7 +223,23 @@ def index_size_areas(analyzer):
     Numero de elementos en el indice por areas
     """
     # TODO Retornar el numero de elementos en el árbol por areas
-    pass
+    
+    area_map = analyzer["areaIndex"]
+    # Obtenemos la lista enlazada de áreas en orden
+    key_list = rbt.key_set(area_map)
+    result = {}
+
+    # Recorremos por índice de 0 a size-1
+    n = sll.size(key_list)
+    for i in range(n):
+        area = sll.get_element(key_list, i)
+        lst = rbt.get(area_map, area)       # lista de crímenes para esa área
+        count = sll.size(lst) if lst else 0
+        result[area] = count
+
+    return result
+
+
 
 
 def min_key_areas(analyzer):
@@ -226,7 +247,16 @@ def min_key_areas(analyzer):
     Llave mas pequena por areas
     """
     # TODO Retornar la llave más pequeña del árbol por áreas
-    pass
+    
+    area_map = analyzer["areaIndex"]
+    # obtenemos todas las áreas ordenadas
+    keys_list = rbt.key_set(area_map)
+    # si no hay áreas, devolvemos None
+    if sll.size(keys_list) == 0:
+        return None
+    # la primera clave es la mínima
+    return sll.get_element(keys_list, 0)
+
 
 
 def max_key_areas(analyzer):
@@ -234,7 +264,18 @@ def max_key_areas(analyzer):
     Llave mas grande por areas
     """
     # TODO Retornar la llave más grande del árbol por áreas
-    pass
+    
+    area_map = analyzer["areaIndex"]
+    # obtenemos todas las áreas ordenadas
+    keys_list = rbt.key_set(area_map)
+    n = sll.size(keys_list)
+    # si no hay áreas, devolvemos None
+    if n == 0:
+        return None
+    # la última clave es la máxima
+    return sll.get_element(keys_list, n - 1)
+    
+    
 
 def get_crimes_by_range_area(analyzer, initialArea, finalArea):
     """
