@@ -17,7 +17,7 @@ def insert_node(root, key, value):
     Si ya existe la clave, sólo actualiza el valor.
     Devuelve la nueva raíz del subárbol.
     """
-    # 1) Inserción BST básica
+    # 1 Inserción BST básica
     if root is None:
         return node.new_node(key,value)
     if key < root["key"]:
@@ -28,7 +28,7 @@ def insert_node(root, key, value):
         # reemplazo de valor en caso de clave duplicada
         root["value"] = value
 
-    # 2) Reparaciones LLRB (reglas 2.1, 2.2, 2.3)
+    # 2 Reparaciones LLRB (reglas 2.1, 2.2, 2.3)
     # 2.1 Si hay enlace rojo a la derecha: rotar izquierda
     if is_red(root["right"]) and not is_red(root["left"]):
         root = rotate_left(root)
@@ -39,7 +39,7 @@ def insert_node(root, key, value):
     if is_red(root["left"]) and is_red(root["right"]):
         flip_colors(root)
 
-    # 3) Actualizar tamaño del subárbol
+    # 3 Actualizar tamaño del subárbol
     root["size"] = 1 + size_tree(root["left"]) + size_tree(root["right"])
     return root
 
