@@ -1,5 +1,6 @@
 
 from DataStructures.List import single_linked_list as sll
+from DataStructures.Tree import rbt_node as node
 
 def new_map():
     red_black_tree = {"root": None,
@@ -7,9 +8,10 @@ def new_map():
 
     return red_black_tree
 
-def insert_node (root, key,value):
+
     
-   def insert_node(root, key, value):
+    
+def insert_node(root, key, value):
     """
     Inserta (key, value) en el RBT con raíz `root`. 
     Si ya existe la clave, sólo actualiza el valor.
@@ -17,14 +19,7 @@ def insert_node (root, key,value):
     """
     # 1) Inserción BST básica
     if root is None:
-        return {
-            "key": key,
-            "value": value,
-            "left": None,
-            "right": None,
-            "color": "RED",    # nuevo nodo siempre rojo
-            "size": 1          # tamaño inicial
-        }
+        return node.new_node(key,value)
     if key < root["key"]:
         root["left"] = insert_node(root["left"], key, value)
     elif key > root["key"]:
@@ -126,11 +121,11 @@ def size_tree (root):
     
 
 def size (my_rbt):
-    return size_tree(my_rbt)
+    return size_tree(my_rbt['root'])
 
 def is_empty (my_rbt):
 
-    if my_rbt is None:
+    if my_rbt['root'] is None:
         return True 
     else:
         return False
@@ -173,151 +168,39 @@ def value_set (my_rbt):
         
         
 def get_min_node (root):
-    
     if root is None:
         return None
     else:
-        return get_min_node(root["left"])  # busca recursivamente el menor de los hijos izquierdos
+        if root['left'] is  None:
+            return root['key']
+        else:
+            return get_min_node(root['left'])
+            
+
 
 def get_min (my_rbt):
-    
-    return get_min_node(my_rbt["root"]) # se llama a la funcion que busca el menor de los hijos izquierdos
+    a = get_min_node(my_rbt["root"])
+    return a # se llama a la funcion que busca el menor de los hijos izquierdos
 
 
 def get_max_node (root):
-    
     if root is None:
         return None
     else:
-        return get_max_node(root["right"])
+        if root['right'] is None:
+            return root["key"]
+        else:
+            return get_max_node(root['right'])
+    
+ 
     
 
 def get_max (my_rbt):
     return get_max_node(my_rbt["root"]) # se llama a la funcion que busca el mayor de los hijos derechos
 
-def delete_min_node (root):
-    
-    if root is None:
-        return None
-   
-    if root["left"] is None:  # si ya el left no tiene hijos significa que es el menor 
-        return root["right"]  # En la llamada recursiva de arriba, ese valor se asignará al puntero izquierdo de su padre, “saltándonos” a root y dejando intactos todos los nodos mayores.
-    
-    root["left"] = delete_min_node(root["left"]) # si tiene hijo izquierdo se llama a la funcion recursivamente
-    
-    return root         
-
-def delete_min (my_rbt):
-    
-    my_rbt["root"] = delete_min_node(my_rbt["root"]) # se llama a la funcion que elimina el menor de los hijos izquierdos
-    if my_rbt["root"] is not None:
-        my_rbt["root"]["color"] = "BLACK" # se cambia el color del root 
-        
-
-def delete_max_node (root):
-    if root is None:
-        return None
-    
-    if root["right"] is None:
-        return root["left"]
-    
-    root["right"] = delete_max_node(root["right"])
-    
-    return root 
-
-def delete_max (my_rbt):
-    
-    my_rbt["root"] = delete_max_node(my_rbt["root"]) 
-    if my_rbt["root"] is not None:
-        my_rbt["root"]["color"] = "BLACK" 
-    
-            
-def floor_key (root, key):
-    
-    if root is None:
-        return None
-    if key == root["key"]: # si la llave ya esta retorna la llave
-        return root["key"]
-    if key < root["key"]:
-        return floor_key(root["left"], key) # si la llave es menor el candidato debe estar a la izquierda
-    
-    candidate = floor_key(root["right"], key) # si la llave es mayor el candidato debe estar a la derecha
-    if candidate is not None:  
-        return candidate    # si el candidato no es none significa que hay algo a la derecha y se retorna la llave del candidato
-    else:
-        return root["key"] # si el candidato es none significa que no hay nada a la derecha y se retorna la llave del padre
-         
-        
-def floor (my_rbt, key):
-    
-    x = floor_key(my_rbt["root"], key) # se llama a la funcion que busca el menor de los hijos izquierdos
-    
-    return x 
-
-def ceiling_key (root, key):
-    
-    if root is None:
-        return None
-    if key == root["key"]:
-        return root["key"]
-    
-    if key > root["key"]:
-        return ceiling_key(root["right"], key)
-    
-    
-    candidate = ceiling_key(root["left"], key) # aqui es key < root["key"] por lo que ya estaria a la izquierda
-    
-    if candidate is not None:
-        return candidate 
-    else:
-        return root["key"]
-    
-
-def ceiling (my_rbt, key):
-    
-    x = ceiling_key(my_rbt["root"], key) 
-    return x
-    
-
-def select_key (root, key):
-    
-    if root is None:
-        return None
-
-    left_count = size_tree(root["left"])
-
-    if key < left_count:
-     
-        return select_key(root["left"], key)
-    elif key == left_count:
-        # es la clave de la raíz
-        return root["key"]
-    else:
-        # está en la derecha, ajustamos pos
-        return select_key(root["right"], key - left_count - 1)
 
     
-def select (my_rbt, pos):
-    
-    return select_key(my_rbt, pos)
-    
-def rank_keys (root, key):
-    
-    if root is None:
-        return 0
-    if key <= root["key"]:
-        return rank_keys(root["left"], key)
-    else:
-        menores = size_tree(root["left"]) 
-        
-        return 1 + menores + rank_keys(root["right"], key)
-    
-    
-def rank (my_rbt, key):
-    
-    x = rank_keys(my_rbt["root"], key) 
-    return 
-      
+              
       
 def height_tree (root):
     
